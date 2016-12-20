@@ -31,3 +31,5 @@ Because of the use of only one schema of the TPC-DS benchmark, that was modified
 On this project the query sintax of 5 DBMS is presented: MongoDB, ElasticSearch, OrientDB, CouchDB and MarkLogic.
 
 Each DBMS folder has 5 sub-folder with queries on different aggregate modelings, for example the sub-folder customer inside the folder MongoDB represents the SSB queries on aggregate modeling based on Customer table.
+
+If the sub-folder has a folder called indexes, it means that for the use of indexes it was necessary re-write the queries on that database to use this feature.
