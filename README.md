@@ -26,6 +26,8 @@ We recomend the use of indexes to faster JSON generation.
 
 After the generation of the JSON it's possible to insert it on Document Store Database Systems and the TPC-DS queries can be executed and tested.
 
+Because of the use of only one schema of the TPC-DS benchmark, that was modified, the queries had to be altered to use the new schema created. Furthermore, the filters used on the queries was filled randomly. These modifications can be seen on the file schema adaptation.  
+
 On this project the query sintax of 5 DBMS is presented: MongoDB, ElasticSearch, OrientDB, CouchDB and MarkLogic.
 
 Each DBMS folder has 5 sub-folder with queries on different aggregate modelings, for example the sub-folder customer inside the folder MongoDB represents the SSB queries on aggregate modeling based on Customer table.
