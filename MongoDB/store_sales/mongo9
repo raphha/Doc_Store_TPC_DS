@@ -1,0 +1,2 @@
+#!/bin/bash
+mongo localhost:27017/store_sales --eval 'db.store_sales.aggregate([{"$match":{"$and":[{"$or":[{"$and":[{"customer.hd_dep_count":1},{"customer.hd_vehicle_count":{"$lte":3}}]},{"$and":[{"customer.hd_dep_count":2},{"customer.hd_vehicle_count":{"$lte":4}}]},{"$and":[{"customer.hd_dep_count":3},{"customer.hd_vehicle_count":{"$lte":5}}]}]},{"time.t_hour":8},{"time.t_minute":{"$gte":30}},{"s_store_name":"ese"}]}},{"$group":{"_id":null, "h8_30_to_9":{"$sum":1}}}]).toArray()' >>~/Documentos/benchmarktpc/mongoDB/store_sales/resultados/query9.txt

@@ -1,0 +1,2 @@
+#!/bin/bash
+mongo localhost:27017/date --eval 'db.date.aggregate([{"$match":{"$and":[{"d_year":2001},{"store_sales.item.i_current_price":{"$gt":9}}]}},{"$unwind": "$store_sales"},{"$match":{"$and":[{"d_year":2001},{"store_sales.item.i_current_price":{"$gt":9}}]}},{"$project":{"store_sales.customer.ca_state":1}},{"$group":{"_id":"$store_sales.customer.ca_state", "cnt":{"$sum":1}}}]).toArray()' >>~/Documentos/benchmarktpc/mongoDB/date/resultados/query2nova.txt

@@ -1,0 +1,2 @@
+#!/bin/bash
+mongo localhost:27017/item --eval 'db.item.aggregate([{$match:{$and:[{"i_manufact_id":600},{"store_sales.date.d_moy":12}]}},{$unwind: "$store_sales"},{$match:{$and:[{"i_manufact_id":600},{"store_sales.date.d_moy":12}]}},{$project:{"store_sales.date.d_year":1, "i_brand_id":1, "i_brand":1, "store_sales.ss_sales_price":1}},{$group:{"_id":{"d_year": "$store_sales.date.d_year", "i_brand_id": "$i_brand_id","i_brand":"$i_brand"}, revenue:{$sum:"$store_sales.ss_sales_price"}}}]).toArray()' >>~/Documentos/benchmarktpc/mongoDB/item/resultados/query1.txt

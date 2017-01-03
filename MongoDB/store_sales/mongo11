@@ -1,0 +1,2 @@
+#!/bin/bash
+mongo localhost:27017/store_sales --eval 'db.store_sales.aggregate([{"$match":{"$and":[{"customer.hd_dep_count":3},{"time.t_hour":12},{"time.t_minute":{"$gte":30}},{"s_store_name":"ese"}]}},{"$group":{"_id":null, "h12_30_to_13":{"$sum":1}}}]).toArray()' >>~/Documentos/benchmarktpc/mongoDB/store_sales/resultados/query11.txt

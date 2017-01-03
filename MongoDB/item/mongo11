@@ -1,0 +1,2 @@
+#!/bin/bash
+mongo localhost:27017/item --eval 'db.item.aggregate([{"$match":{"$and":[{"store_sales.customer.hd_dep_count":3},{"store_sales.time.t_hour":12},{"store_sales.time.t_minute":{"$gte":30}},{"store_sales.s_store_name":"ese"}]}},{"$unwind": "$store_sales"},{"$match":{"$and":[{"store_sales.customer.hd_dep_count":3},{"store_sales.time.t_hour":12},{"store_sales.time.t_minute":{"$gte":30}},{"store_sales.s_store_name":"ese"}]}},{"$group":{"_id":null, "h12_30_to_13":{"$sum":1}}}]).toArray()' >>~/Documentos/benchmarktpc/mongoDB/item/resultados/query11.txt
