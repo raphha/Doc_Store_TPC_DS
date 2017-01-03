@@ -1,0 +1,1 @@
+connect remote:127.0.0.1/store_sales_tpcg root rasns1901;select count(*) from store_sales where time contains(t_hour=12 and t_minute>=30) and customer contains(hd_dep_count=3) and s_store_name="ese" 

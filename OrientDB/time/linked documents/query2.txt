@@ -1,0 +1,1 @@
+connect remote:127.0.0.1/time_tpcg root rasns1901;select first(customer.ca_state), count(*) as cnt from store_sales where date contains(d_year=2001) and item contains(i_current_price>9) group by customer.ca_state limit 10000

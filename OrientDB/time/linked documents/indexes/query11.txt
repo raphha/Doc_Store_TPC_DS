@@ -1,0 +1,1 @@
+connect remote:127.0.0.1/time_tpcg root rasns1901;select count(*) from (select rid.store_sales as store from index:hm where key between [12,30] and [12,60] unwind store) where  store.customer contains(hd_dep_count=3) and store.s_store_name="ese" 

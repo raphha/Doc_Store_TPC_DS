@@ -1,0 +1,1 @@
+connect remote:127.0.0.1/store_sales_tpc root rasns1901;select first(date.d_year), first(item.i_brand_id), first(item.i_brand), sum(ss_sales_price.asLong()) from store_sales where date contains(d_moy=12) and item contains(i_manufact_id=600) group by date.d_year, item.i_brand_id, item.i_brand limit 10000
