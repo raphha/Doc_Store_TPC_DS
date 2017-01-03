@@ -32,4 +32,6 @@ On this project the query sintax of 5 DBMS is presented: MongoDB, ElasticSearch,
 
 Each DBMS folder has 5 sub-folder with queries on different aggregate modelings, for example the sub-folder customer inside the folder MongoDB represents the SSB queries on aggregate modeling based on Customer table.
 
+Because OrientDB has two way to organize its data its folder contains two sub-folders called linked documents and nested documents.
+
 If the sub-folder has a folder called indexes, it means that for the use of indexes it was necessary re-write the queries on that database to use this feature.
