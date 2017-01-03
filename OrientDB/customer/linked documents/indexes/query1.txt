@@ -1,0 +1,1 @@
+connect remote:127.0.0.1/customer_tpcg root rasns1901;select first(date.d_year), first(item.i_brand_id), first(item.i_brand), sum(ss_sales_price.asLong()) from store_sales where ss_item_sk in (select rid.i_item_sk from index:manufact_id where key=600) and date contains(d_moy=12) group by date.d_year, item.i_brand_id, item.i_brand limit 10000 levou 1804s
