@@ -1,0 +1,1 @@
+connect remote:127.0.0.1/date_tpcg root rasns1901;select first(store.customer.ca_state), count(*) as cnt from (select store_sales as store from date where d_year=2001 and store_sales.item contains(i_current_price>9) unwind store) where store.item contains(i_current_price>9) group by store.customer.ca_state limit 10000
