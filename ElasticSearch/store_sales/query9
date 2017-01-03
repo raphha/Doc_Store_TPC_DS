@@ -1,0 +1,20 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_store_sales/store_sales/_search?pretty' -d '
+{
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+                 {"match": {"s_store_name":"ese"}},
+		{"bool":{"should":[{"bool":{"must":[{"match": {"customer.hd_dep_count":1}},{"range": {"customer.hd_vehicle_count":{"lte":3}}}]}},
+    {"bool":{"must":[{"match": {"customer.hd_dep_count":2}},{"range": {"customer.hd_vehicle_count":{"lte":4}}}]}},
+    {"bool":{"must":[{"match": {"customer.hd_dep_count":3}},{"range": {"customer.hd_vehicle_count":{"lte":5}}}]}}]}},
+                  {"match": {"time.t_hour":8}},
+				   {"range": {"time.t_minute":{"gte":30}}}     
+                ]
+               }
+			   }
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/store_sales/resultados/query9.txt

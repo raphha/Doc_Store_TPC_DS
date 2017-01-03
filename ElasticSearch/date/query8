@@ -1,0 +1,74 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_date/date/_search?pretty' -d '
+{
+  "query": {"filtered":{ "filter":{
+  "bool": {
+	      "must": [
+		  {"range": {"d_year":{"gte":1998,"lte":2000}}},
+				   {"term": {"d_dow":1}}, 
+		{
+    "filtered": {
+      "filter": {
+        "nested": {
+          "inner_hits": {},
+          "path": "store_sales",
+          "query": {
+            "filtered": {
+              "filter": {
+                "bool": {
+                "must": [ 
+				{"range": {"store_sales.s_number_employees":{"gte":200,"lte":295}}}, 
+		{"bool":{"should":[{"term": {"store_sales.customer.hd_dep_count":5}},{"range": {"store_sales.customer.hd_vehicle_count":{"gt":2}}}]}}
+                  
+                ]
+               }
+              }
+            } 
+      }
+    }
+   }}}]}}}},
+   "aggs": {
+    "store_sales": {
+      "nested": {
+        "path": "store_sales"
+      },
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+				{"range": {"store_sales.s_number_employees":{"gte":200,"lte":295}}}, 
+		{"bool":{"should":[{"term": {"store_sales.customer.hd_dep_count":5}},{"range": {"store_sales.customer.hd_vehicle_count":{"gt":2}}}]}} 
+                ]
+               }
+			   },
+			   "aggs": {
+   		 "group_by_ticket": {
+     		 "terms": {
+      		  "field": "store_sales.ss_ticket_number",
+            "order" : { "_term" : "asc" }, "size": 100000
+            },
+            "aggs": {
+   		 "group_by_customer": {
+     		 "terms": {
+      		  "field": "store_sales.ss_customer_sk",
+            "order" : { "_term" : "asc" }, "size": 100000
+            },
+             "aggs": {
+   		 "group_by_s_city": {
+     		 "terms": {
+      		  "field": "store_sales.s_city",
+            "order" : { "_term" : "asc" }, "size": 100000
+            },
+			"aggs": {
+    			"amt": {
+    			  "sum": {
+     		        "field": "store_sales.ss_coupon_amt"
+         }}}}}}}
+   }
+  }
+        }
+		}
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/date/resultados/query8.txt

@@ -1,0 +1,49 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_time/time/_search?pretty' -d '
+{
+  "query": {"filtered": {
+      "filter": {
+  "bool": {
+	      "must": [
+                  {"term": {"t_hour":12}},
+				   {"range": {"t_minute":{"gte":30}}}, 
+		{
+    "filtered": {
+      "filter": {
+        "nested": {
+          "inner_hits": {},
+          "path": "store_sales",
+          "query": {
+            "filtered": {
+              "filter": {
+                "bool": {
+                "must": [ 
+				{"term": {"store_sales.s_store_name":"ese"}},
+		{"term": {"store_sales.customer.hd_dep_count":3}}
+                ]
+               }
+              }
+            } 
+      }
+    }
+   }}}]}}}},
+   "aggs": {
+    "store_sales": {
+      "nested": {
+        "path": "store_sales"
+      },
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+				{"term": {"store_sales.s_store_name":"ese"}},
+		{"term": {"store_sales.customer.hd_dep_count":3}}  
+                ]
+               }
+			   }
+        }
+		}
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/time/resultados/query11.txt

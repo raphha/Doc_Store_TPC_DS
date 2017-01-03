@@ -1,0 +1,86 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_date/date/_search?pretty' -d '
+{
+  "query": {"filtered":{ "filter":{
+   "bool": {
+	      "must": [
+		  {"range" : {"d_month_seq":{"gte":1200, "lte":1211}}}, 
+		{
+    "filtered": {
+      "filter": {
+        "nested": {
+          "inner_hits": {},
+          "path": "store_sales",
+          "query": {
+            "filtered": {
+              "filter": {
+                "bool": {
+                "must": [ 
+				 {"terms": {"store_sales.item.i_category":["Music","Home","Sports"]}}   
+                ]
+               }
+              }
+            }
+          }
+        }
+      }
+    }
+  }]}}}},
+   "aggs": {
+    "lineorder": {
+      "nested": {
+        "path": "store_sales"
+      },
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+                  {"terms": {"store_sales.item.i_category":["Music","Home","Sports"]}} 
+                ]
+               }
+			   },
+          "aggs": {
+   		 "group_by_item_id": {
+     		 "terms": {
+      		  "field": "store_sales.item.i_item_id",
+            "order" : { "_term" : "asc" }, "size": 100000
+            },
+            "aggs": {
+   		 	"group_by_desc": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_item_desc",
+            "order" : { "_term" : "asc" }
+      		         },
+					  "aggs": {
+   		 	"group_by_category": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_category",
+            "order" : { "_term" : "asc" }
+      		         },
+					 "aggs": {
+   		 	"group_by_class": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_class",
+            "order" : { "_term" : "asc" }
+      		         },
+					 "aggs": {
+   		 	"group_by_price": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_current_price",
+            "order" : { "_term" : "asc" }
+      		         },
+			"aggs": {
+    			"itemrevenue": {
+    			  "sum": {
+     		        "field": "store_sales.ss_ext_sales_price"
+         }}}}}}}}}
+       }
+     }
+   }
+  }
+        }
+		}
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/date/resultados/query5.txt

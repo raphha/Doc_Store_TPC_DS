@@ -1,0 +1,84 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_time/time/_search?pretty' -d '
+{
+  "query": {
+    "filtered": {
+      "filter": {
+        "nested": {
+          "inner_hits": {},
+          "path": "store_sales",
+          "query": {
+            "filtered": {
+              "filter": {
+                "bool": {
+                "must": [ 
+				 {"terms": {"store_sales.item.i_category":["Music","Home","Sports"]}}, 
+                  {"range" : {"store_sales.date.d_date":{"gte":"2002-01-01", "lte":"2002-01-31"}}}
+                ]
+               }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+   "aggs": {
+    "lineorder": {
+      "nested": {
+        "path": "store_sales"
+      },
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+                 {"terms": {"store_sales.item.i_category":["Music","Home","Sports"]}}, 
+                  {"range" : {"store_sales.date.d_date":{"gte":"2002-01-01", "lte":"2002-01-31"}}}
+                ]
+               }
+			   },
+          "aggs": {
+   		 "group_by_item_id": {
+     		 "terms": {
+      		  "field": "store_sales.item.i_item_id",
+            "order" : { "_term" : "asc" }, "size": 100000
+            },
+            "aggs": {
+   		 	"group_by_desc": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_item_desc",
+            "order" : { "_term" : "asc" }, "size": 100000
+      		         },
+					  "aggs": {
+   		 	"group_by_category": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_category",
+            "order" : { "_term" : "asc" }, "size": 100000
+      		         },
+					 "aggs": {
+   		 	"group_by_class": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_class",
+            "order" : { "_term" : "asc" }, "size": 100000
+      		         },
+					 "aggs": {
+   		 	"group_by_price": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_current_price",
+            "order" : { "_term" : "asc" }, "size": 100000
+      		         },
+			"aggs": {
+    			"itemrevenue": {
+    			  "sum": {
+     		        "field": "store_sales.ss_ext_sales_price"
+         }}}}}}}}}
+       }
+     }
+   }
+  }
+        }
+		}
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/time/resultados/query12.txt

@@ -1,0 +1,83 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_date/date/_search?pretty' -d '
+{
+  "query": {"filtered":{ "filter":{
+    "bool": {
+	      "must": [
+		  {"term" : {"d_moy":11}},
+		  {"term" : {"d_year":2001}},
+		{
+    "filtered": {
+      "filter": {
+        "nested": {
+          "inner_hits": {},
+          "path": "store_sales",
+          "query": {
+            "filtered": {
+              "filter": {
+                "bool": {
+                "must": [
+                  {"term": {"store_sales.item.i_manager_id":20}},
+				{"term": {"store_sales.customer.ca_zip":35709}} 
+                ]
+               }
+              }
+            }
+          }
+        }
+      }
+    }
+  }]}}}},
+   "aggs": {
+    "store_sales": {
+      "nested": {
+        "path": "store_sales"
+      },
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+                  {"term": {"store_sales.item.i_manager_id":20}},
+				{"term": {"store_sales.customer.ca_zip":35709}} 
+                ]
+               }
+			   },
+          "aggs": {
+   		 "group_by_brand": {
+     		 "terms": {
+      		  "field": "store_sales.item.i_brand",
+            "order" : { "_term" : "asc" }
+            },
+            "aggs": {
+   		 	"group_by_brand_id": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_brand_id",
+            "order" : { "_term" : "asc" }
+      		         },
+					  "aggs": {
+   		 	"group_by_manufact_id": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_manufact_id",
+            "order" : { "_term" : "asc" }
+      		         },
+					 "aggs": {
+   		 	"group_by_manufact": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_manufact",
+            "order" : { "_term" : "asc" }
+      		         },
+			"aggs": {
+    			"ext_price": {
+    			  "sum": {
+     		        "field": "store_sales.ss_ext_sales_price"
+         }}}}}}}
+       }
+     }
+   }
+  }
+        }
+		}
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/date/resultados/query3.txt

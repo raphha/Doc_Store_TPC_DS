@@ -1,0 +1,18 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_store_sales/store_sales/_search?pretty' -d '
+{
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+                 {"match": {"s_store_name":"ese"}},
+		{"match": {"customer.hd_dep_count":3}},
+                  {"match": {"time.t_hour":12}},
+				   {"range": {"time.t_minute":{"gte":30}}}      
+                ]
+               }
+			   }
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/store_sales/resultados/query11.txt

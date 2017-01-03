@@ -1,0 +1,24 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_store_sales/store_sales/_search?pretty' -d '
+{
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+                  {"range": {"item.i_current_price":{"gt":9}}},
+                  {"match" : {"date.d_year":2001}}
+                ]
+               }
+			   },   
+			   "aggs": {
+   		 "group_by_state": {
+     		 "terms": {
+      		  "field": "customer.ca_state",
+            "order" : { "_term" : "asc" }, "size": 10000
+            }
+   }
+  }
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/store_sales/resultados/query2.txt

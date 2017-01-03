@@ -1,0 +1,72 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_time/time/_search?pretty' -d '
+{
+  "query": {
+    "filtered": {
+      "filter": {
+        "nested": {
+          "inner_hits": {},
+          "path": "store_sales",
+          "query": {
+            "filtered": {
+              "filter": {
+                "bool": {
+                "must": [ 
+                  {"term": {"store_sales.item.i_manufact_id":600}},
+                  {"term" : {"store_sales.date.d_moy":12}}
+                ]
+               }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+   "aggs": {
+    "lineorder": {
+      "nested": {
+        "path": "store_sales"
+      },
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+                  {"term": {"store_sales.item.i_manufact_id":600}},
+                  {"term" : {"store_sales.date.d_moy":12}}
+                ]
+               }
+			   },
+          "aggs": {
+   		 "group_by_year": {
+     		 "terms": {
+      		  "field": "store_sales.date.d_year",
+            "order" : { "_term" : "asc" }
+            },
+            "aggs": {
+   		 	"group_by_brand": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_brand",
+            "order" : { "_term" : "asc" }
+      		         },
+					  "aggs": {
+   		 	"group_by_brand_id": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_brand_id",
+            "order" : { "_term" : "asc" }
+      		         },
+			"aggs": {
+    			"sum_revenue": {
+    			  "sum": {
+     		        "field": "store_sales.ss_sales_price"
+         }}}}}
+       }
+     }
+   }
+  }
+        }
+		}
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/time/resultados/query1.txt

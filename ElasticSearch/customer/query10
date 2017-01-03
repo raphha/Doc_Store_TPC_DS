@@ -1,0 +1,90 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_customer_tpc/customer/_search?pretty' -d '
+{
+  "query": {
+    "filtered": {
+      "filter": {
+        "nested": {
+          "inner_hits": {},
+          "path": "store_sales",
+          "query": {
+            "filtered": {
+              "filter": {
+                "bool": {
+                "must": [ 
+				          {"bool":{"should":[{"bool":{"must":[{"terms": {"store_sales.item.i_category":["Music","Home","Sports"]}},{"terms": {"store_sales.item.i_class":["country","rugs","fishing"]}}]}},{"bool":{"must":[{"terms": {"store_sales.item.i_category":["Women","Men","Children"]}},{"terms": {"store_sales.item.i_class":["swimwear","shirts","pants"]}}]}}]}}, 
+                  {"term" : {"store_sales.date.d_year":2000}}
+                ]
+               }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+   "aggs": {
+    "lineorder": {
+      "nested": {
+        "path": "store_sales"
+      },
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+                  {"bool":{"should":[{"bool":{"must":[{"terms": {"store_sales.item.i_category":["Music","Home","Sports"]}},{"terms": {"store_sales.item.i_class":["country","rugs","fishing"]}}]}},{"bool":{"must":[{"terms": {"store_sales.item.i_category":["Women","Men","Children"]}},{"terms": {"store_sales.item.i_class":["swimwear","shirts","pants"]}}]}}]}}, 
+                  {"term" : {"store_sales.date.d_year":2000}}
+                ]
+               }
+			   },
+          "aggs": {
+   		 "group_by_category": {
+     		 "terms": {
+      		  "field": "store_sales.item.i_category",
+            "order" : { "_term" : "asc" }, "size": 100000
+            },
+            "aggs": {
+   		 	"group_by_class": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_class",
+            "order" : { "_term" : "asc" }, "size": 100000
+      		         },
+					  "aggs": {
+   		 	"group_by_brand": {
+     		 	"terms": {
+      		 	 "field": "store_sales.item.i_brand",
+            "order" : { "_term" : "asc" }, "size": 100000
+      		         },
+					 "aggs": {
+   		 	"group_by_store_name": {
+     		 	"terms": {
+      		 	 "field": "store_sales.s_store_name",
+            "order" : { "_term" : "asc" }, "size": 100000
+      		         },
+					 "aggs": {
+   		 	"group_by_company": {
+     		 	"terms": {
+      		 	 "field": "store_sales.s_company_name",
+            "order" : { "_term" : "asc" }, "size": 100000
+      		         },
+                   "aggs": {
+   		 	"group_by_moy": {
+     		 	"terms": {
+      		 	 "field": "store_sales.date.d_moy",
+            "order" : { "_term" : "asc" }, "size": 100000
+      		         },
+			"aggs": {
+    			"sum_sales": {
+    			  "sum": {
+     		        "field": "store_sales.ss_sales_price"
+         }}}}}}}}}}}
+       }
+     }
+   }
+  }
+        }
+		}
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/customer/resultados/query10.txt

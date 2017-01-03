@@ -1,0 +1,51 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_store_sales/store_sales/_search?pretty' -d '
+{
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+                  {"match": {"item.i_manager_id":20}},
+                  {"match" : {"date.d_moy":11}},
+				  {"match" : {"date.d_year":2001}},
+		{"match": {"customer.ca_zip":35709}}
+                ]
+               }
+			   },
+          "aggs": {
+   		 "group_by_brand": {
+     		 "terms": {
+      		  "field": "item.i_brand",
+            "order" : { "_term" : "asc" }
+            },
+            "aggs": {
+   		 	"group_by_brand_id": {
+     		 	"terms": {
+      		 	 "field": "item.i_brand_id",
+            "order" : { "_term" : "asc" }
+      		         },
+					  "aggs": {
+   		 	"group_by_manufact_id": {
+     		 	"terms": {
+      		 	 "field": "item.i_manufact_id",
+            "order" : { "_term" : "asc" }
+      		         },
+					 "aggs": {
+   		 	"group_by_manufact": {
+     		 	"terms": {
+      		 	 "field": "item.i_manufact",
+            "order" : { "_term" : "asc" }
+      		         },
+			"aggs": {
+    			"ext_price": {
+    			  "sum": {
+     		        "field": "ss_ext_sales_price"
+         }}}}}}}
+       }
+     }
+   }
+  }
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/store_sales/resultados/query3.txt

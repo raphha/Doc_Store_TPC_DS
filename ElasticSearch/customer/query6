@@ -1,0 +1,82 @@
+#!/bin/bash
+curl -XPOST 'localhost:9200/i_customer_tpc/customer/_search?pretty' -d '
+{
+  "query": {"filtered":{ "filter":{
+  "bool": {
+	      "must": [
+		{"bool":{"should":[{"term": {"hd_dep_count":4}},{"term": {"hd_vehicle_count":2}}]}},
+		{
+    "filtered": {
+      "filter": {
+        "nested": {
+          "inner_hits": {},
+          "path": "store_sales",
+          "query": {
+            "filtered": {
+              "filter": {
+                "bool": {
+                "must": [ 
+				{"term" : {"store_sales.s_city":"Midway"}},
+                  {"range": {"store_sales.date.d_year":{"gte":1999,"lte":2001}}},
+				   {"range": {"store_sales.date.d_dom":{"gte":20,"lte":21}}}  
+                ]
+               }
+              }
+            }
+          }
+        }
+      }
+    }
+   }]}}}},
+   "aggs": {
+   		 "group_by_lastname": {
+     		 "terms": {
+      		  "field": "c_last_name",
+            "order" : { "_term" : "asc" }, "size": 100000
+            },
+			"aggs": {
+   		 "group_by_firstname": {
+     		 "terms": {
+      		  "field": "c_first_name",
+            "order" : { "_term" : "asc" }, "size": 100000
+            },
+			"aggs": {
+   		 "group_by_cacity": {
+     		 "terms": {
+      		  "field": "ca_city",
+            "order" : { "_term" : "asc" }, "size": 100000
+            },
+   "aggs": {
+    "store_sales": {
+      "nested": {
+        "path": "store_sales"
+      },
+      "aggs": {
+	  "only_loc": {
+          "filter": {
+                "bool": {
+                "must": [ 
+                 {"term" : {"store_sales.s_city":"Midway"}},
+                  {"range": {"store_sales.date.d_year":{"gte":1999,"lte":2001}}},
+				        {"range": {"store_sales.date.d_dom":{"gte":20,"lte":21}}}   
+                ]
+               }
+			   },
+			   "aggs": {
+   		 "group_by_ticket": {
+     		 "terms": {
+      		  "field": "store_sales.ss_ticket_number",
+            "order" : { "_term" : "asc" }, "size": 100000
+            },
+			"aggs": {
+    			"extended_price": {
+    			  "sum": {
+     		        "field": "store_sales.ss_ext_sales_price"
+         }}}
+   }
+  }
+        }
+		}}}}}}}
+  }
+}, "size":0
+}' -o /home/raphael/Documentos/benchmarktpc/elastic/customer/resultados/query6.txt
