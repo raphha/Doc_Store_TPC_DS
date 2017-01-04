@@ -1,0 +1,2 @@
+#!/bin/bash
+curl -X GET http://127.0.0.1:5984/db_store_sales/_design/query10/_view/q10?group=true -o /home/raphael/Documentos/benchmarktpc/couchdb/store_sales/resultados/query10.txt

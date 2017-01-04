@@ -1,0 +1,2 @@
+#!/bin/bash
+curl -X GET http://127.0.0.1:5984/db_time/_design/query1/_view/q1?group=true -o /home/raphael/Documentos/benchmarktpc/couchdb/time/resultados/query1.txt

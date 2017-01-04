@@ -1,0 +1,2 @@
+#!/bin/bash
+curl -X GET http://127.0.0.1:5984/db_item/_design/query5/_view/q5?group=true -o /home/raphael/Documentos/benchmarktpc/couchdb/item/resultados/query5.txt

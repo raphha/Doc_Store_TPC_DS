@@ -1,0 +1,2 @@
+#!/bin/bash
+curl -X GET http://127.0.0.1:5984/db_date/_design/query9/_view/q9 -o /home/raphael/Documentos/benchmarktpc/couchdb/date/resultados/query9.txt
