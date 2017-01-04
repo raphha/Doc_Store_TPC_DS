@@ -14,7 +14,7 @@ The TPC-DS has seven schemas that is used for the proposed benchmark.
 
 This repository uses just one of its schema (the Store_Sales schema) and demonstrate a way to convert it's data to JSON documents, so it can be used on Document Store Database Systems.
 
-To limit the depth of the documents to 3 levels, some tables of this schema had been normalized, so the result schema is a star schema (TPC-DS schema Adaptation). 
+To limit the depth of the documents to 3 levels, some tables of this schema had been denormalized, so the result schema is a star schema (TPC-DS schema Adaptation). 
 
 After the schema adaptation it's necessary to eliminate some data from the tables, so the result JSON can have the same data. For example. Some orders created by the TPC-DS don't have the Client data, so the aggregate modeling based on the Client table would not have those orders. Another alternative was to create a id for this cases, but we choose to avoid orders with empty data. 
 
